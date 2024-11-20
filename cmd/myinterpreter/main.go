@@ -17,6 +17,10 @@ func scanner(fileContents string) {
 				fmt.Println("LEFT_PAREN ( null")
 			} else if char == RIGHT_PAREN {
 				fmt.Println("RIGHT_PAREN ) null")
+			} else if char == LEFT_BRACE {
+				fmt.Println("LEFT_BRACE { null")
+			} else if char == RIGHT_BRACE {
+				fmt.Println("RIGHT_BRACE } null")
 			}
 		}
 	}
