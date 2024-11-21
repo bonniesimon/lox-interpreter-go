@@ -56,6 +56,7 @@ func main() {
 
 	if len(fileContents) > 0 {
 		tokens := scanner(string(fileContents))
+
 		for _, token := range tokens {
 			token.Debug()
 			fmt.Println()
