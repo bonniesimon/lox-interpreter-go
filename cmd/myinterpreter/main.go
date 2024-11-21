@@ -16,18 +16,40 @@ func scanner(fileContents string) []Token {
 			char := lines[lineCount][charCount]
 
 			if char == '(' {
-				AddToken(Token{"LEFT_PAREN", "(", ""}, &tokens)
+				AddToken(LEFT_PAREN, "(", "", &tokens)
 			} else if char == ')' {
-				AddToken(Token{"RIGHT_PAREN", ")", ""}, &tokens)
+				AddToken(RIGHT_PAREN, ")", "", &tokens)
 			} else if char == '{' {
-				AddToken(Token{"LEFT_BRACE", "{", ""}, &tokens)
+				AddToken(LEFT_BRACE, "{", "", &tokens)
 			} else if char == '}' {
-				AddToken(Token{"RIGHT_BRACE", "}", ""}, &tokens)
+				AddToken(RIGHT_BRACE, "}", "", &tokens)
+			} else if char == ',' {
+				AddToken(COMMA, ",", "", &tokens)
+			} else if char == '.' {
+				AddToken(DOT, ".", "", &tokens)
+			} else if char == '-' {
+				AddToken(MINUS, "-", "", &tokens)
+			} else if char == '+' {
+				AddToken(PLUS, "+", "", &tokens)
+			} else if char == ';' {
+				AddToken(SEMICOLON, ";", "", &tokens)
+			} else if char == '/' {
+				AddToken(SLASH, "/", "", &tokens)
+			} else if char == '*' {
+				AddToken(STAR, "*", "", &tokens)
+			} else if char == '!' {
+				AddToken(BANG, "!", "", &tokens)
+			} else if char == '=' {
+				AddToken(EQUAL, "=", "", &tokens)
+			} else if char == '>' {
+				AddToken(GREATER, ">", "", &tokens)
+			} else if char == '<' {
+				AddToken(LESS, "<", "", &tokens)
 			}
 		}
 	}
 
-	AddToken(Token{"EOF", "EOF", ""}, &tokens)
+	AddToken("EOF", "EOF", "", &tokens)
 
 	return tokens
 }

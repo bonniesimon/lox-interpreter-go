@@ -57,7 +57,9 @@ type Token struct {
 	Literal   string
 }
 
-func AddToken(newToken Token, tokens *[]Token) {
+func AddToken(tokenType string, lexeme string, literal string, tokens *[]Token) {
+	newToken := Token{tokenType, lexeme, literal}
+
 	*tokens = append(*tokens, newToken)
 }
 
