@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-var tokens []Token
+func scanner(fileContents string) []Token {
+	var tokens []Token
 
-func scanner(fileContents string) {
 	lines := strings.Split(fileContents, "\n")
 
 	for lineCount := 0; lineCount < len(lines); lineCount++ {
@@ -28,6 +28,8 @@ func scanner(fileContents string) {
 	}
 
 	AddToken(Token{"EOF", "EOF", ""}, &tokens)
+
+	return tokens
 }
 
 func main() {
@@ -53,7 +55,7 @@ func main() {
 	}
 
 	if len(fileContents) > 0 {
-		scanner(string(fileContents))
+		tokens := scanner(string(fileContents))
 		for _, token := range tokens {
 			token.Debug()
 			fmt.Println()
