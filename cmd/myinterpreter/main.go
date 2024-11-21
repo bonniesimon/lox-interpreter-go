@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+var tokens []Token
+
 func scanner(fileContents string) {
 	lines := strings.Split(fileContents, "\n")
 
@@ -13,19 +15,19 @@ func scanner(fileContents string) {
 		for charCount := 0; charCount < len(lines[lineCount]); charCount++ {
 			char := lines[lineCount][charCount]
 
-			if char == LEFT_PAREN {
-				fmt.Println("LEFT_PAREN ( null")
-			} else if char == RIGHT_PAREN {
-				fmt.Println("RIGHT_PAREN ) null")
-			} else if char == LEFT_BRACE {
-				fmt.Println("LEFT_BRACE { null")
-			} else if char == RIGHT_BRACE {
-				fmt.Println("RIGHT_BRACE } null")
+			if char == '(' {
+				AddToken(Token{"LEFT_PAREN", "(", ""}, &tokens)
+			} else if char == ')' {
+				AddToken(Token{"RIGHT_PAREN", ")", ""}, &tokens)
+			} else if char == '{' {
+				AddToken(Token{"LEFT_BRACE", "{", ""}, &tokens)
+			} else if char == '}' {
+				AddToken(Token{"RIGHT_BRACE", "}", ""}, &tokens)
 			}
 		}
 	}
 
-	fmt.Println("EOF  null")
+	AddToken(Token{"EOF", "EOF", ""}, &tokens)
 }
 
 func main() {
@@ -52,6 +54,10 @@ func main() {
 
 	if len(fileContents) > 0 {
 		scanner(string(fileContents))
+		for _, token := range tokens {
+			token.Debug()
+			fmt.Println()
+		}
 	} else {
 		fmt.Println("EOF  null") // Placeholder, remove this line when implementing the scanner
 	}
