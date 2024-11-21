@@ -6,8 +6,9 @@ import (
 	"strings"
 )
 
-func scanner(fileContents string) []Token {
+func scanner(fileContents string) ([]Token, bool) {
 	var tokens []Token
+	hasError := false
 
 	lines := strings.Split(fileContents, "\n")
 
@@ -45,13 +46,20 @@ func scanner(fileContents string) []Token {
 				AddToken(GREATER, ">", "", &tokens)
 			} else if char == '<' {
 				AddToken(LESS, "<", "", &tokens)
+			} else {
+				hasError = true
+				reportError(lineCount+1, "Unexpected character: "+string(char))
 			}
 		}
 	}
 
 	AddToken("EOF", "EOF", "", &tokens)
 
-	return tokens
+	return tokens, hasError
+}
+
+func reportError(lineNumber int, errorMessage string) {
+	fmt.Fprintf(os.Stderr, "[line %d] Error: %s\n", lineNumber, errorMessage)
 }
 
 func main() {
@@ -77,13 +85,18 @@ func main() {
 	}
 
 	if len(fileContents) > 0 {
-		tokens := scanner(string(fileContents))
+		tokens, hasError := scanner(string(fileContents))
 
 		for _, token := range tokens {
 			token.Debug()
 			fmt.Println()
 		}
+
+		if hasError {
+			os.Exit(65)
+		}
 	} else {
 		fmt.Println("EOF  null") // Placeholder, remove this line when implementing the scanner
 	}
+
 }
