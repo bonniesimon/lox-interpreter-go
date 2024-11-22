@@ -57,9 +57,19 @@ func (s Scanner) Lex() ([]Token, bool) {
 				s.addToken(EQUAL, "=", "")
 			}
 		} else if s.char == '>' {
-			s.addToken(GREATER, ">", "")
+			if s.peak() == '=' {
+				s.addToken(GREATER_EQUAL, ">=", "")
+				s.advance()
+			} else {
+				s.addToken(GREATER, ">", "")
+			}
 		} else if s.char == '<' {
-			s.addToken(LESS, "<", "")
+			if s.peak() == '=' {
+				s.addToken(LESS_EQUAL, "<=", "")
+				s.advance()
+			} else {
+				s.addToken(LESS, "<", "")
+			}
 		} else if s.char == '\n' {
 			s.lines++
 		} else {
@@ -77,7 +87,6 @@ func (s Scanner) Lex() ([]Token, bool) {
 }
 
 func (s Scanner) peak() byte {
-	// fmt.Println("in peak: ", s.source, s.lines, s.current, s.source[s.current])
 	if s.current+1 < len(s.source) {
 		return s.source[s.current+1]
 	}
