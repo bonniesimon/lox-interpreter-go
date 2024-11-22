@@ -43,11 +43,16 @@ func (s Scanner) Lex() ([]Token, bool) {
 		} else if s.char == '*' {
 			s.addToken(STAR, "*", "")
 		} else if s.char == '!' {
-			s.addToken(BANG, "!", "")
+			if s.peak() == '=' {
+				s.addToken(BANG_EQUAL, "!=", "")
+				s.advance()
+			} else {
+				s.addToken(BANG, "!", "")
+			}
 		} else if s.char == '=' {
 			if s.peak() == '=' {
 				s.addToken(EQUAL_EQUAL, "==", "")
-				s.current++
+				s.advance()
 			} else {
 				s.addToken(EQUAL, "=", "")
 			}
