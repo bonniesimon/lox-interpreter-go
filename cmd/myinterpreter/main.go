@@ -41,7 +41,15 @@ func scanner(fileContents string) ([]Token, bool) {
 			} else if char == '!' {
 				AddToken(BANG, "!", "", &tokens)
 			} else if char == '=' {
-				AddToken(EQUAL, "=", "", &tokens)
+				// I should maybe move Scanner to a struct and then have methods for the Scanner struct
+				// It would be much easier since we have the state inside the struct itself
+				// This passes the tests, but I need a better approach to this.
+				if charCount+1 < len(lines[lineCount]) && lines[lineCount][charCount+1] == '=' {
+					AddToken(EQUAL_EQUAL, "==", "", &tokens)
+					charCount++
+				} else {
+					AddToken(EQUAL, "=", "", &tokens)
+				}
 			} else if char == '>' {
 				AddToken(GREATER, ">", "", &tokens)
 			} else if char == '<' {
