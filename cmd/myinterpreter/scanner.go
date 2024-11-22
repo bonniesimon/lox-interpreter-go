@@ -1,78 +1,99 @@
 package main
 
-import "strings"
+import (
+	"errors"
+)
 
 type Scanner struct {
-	content string
-	cursor  int
+	source  string
 	char    byte
-	row     int
-	col     int
+	current int
+	lines   int
 	tokens  []Token
 }
 
 func NewScanner(contents string) Scanner {
-	return Scanner{contents, 0, contents[0], 0, 0, []Token{}}
+	return Scanner{contents, contents[0], 0, 0, []Token{}}
 }
 
 func (s Scanner) Lex() ([]Token, bool) {
 	hasError := false
 
-	lines := strings.Split(s.content, "\n")
-
-	for ; s.row < len(lines); s.row++ {
-		for s.col = 0; s.col < len(lines[s.row]); s.col++ {
-			s.char = lines[s.row][s.col]
-
-			if s.char == '(' {
-				s.addToken(LEFT_PAREN, "(", "")
-			} else if s.char == ')' {
-				s.addToken(RIGHT_PAREN, ")", "")
-			} else if s.char == '{' {
-				s.addToken(LEFT_BRACE, "{", "")
-			} else if s.char == '}' {
-				s.addToken(RIGHT_BRACE, "}", "")
-			} else if s.char == ',' {
-				s.addToken(COMMA, ",", "")
-			} else if s.char == '.' {
-				s.addToken(DOT, ".", "")
-			} else if s.char == '-' {
-				s.addToken(MINUS, "-", "")
-			} else if s.char == '+' {
-				s.addToken(PLUS, "+", "")
-			} else if s.char == ';' {
-				s.addToken(SEMICOLON, ";", "")
-			} else if s.char == '/' {
-				s.addToken(SLASH, "/", "")
-			} else if s.char == '*' {
-				s.addToken(STAR, "*", "")
-			} else if s.char == '!' {
-				s.addToken(BANG, "!", "")
-			} else if s.char == '=' {
-				// I should maybe move Scanner to a struct and then have methods for the Scanner struct
-				// It would be much easier since we have the state inside the struct itself
-				// This passes the tests, but I need a better approach to this.
-				if s.col+1 < len(lines[s.row]) && lines[s.row][s.col+1] == '=' {
-					s.addToken(EQUAL_EQUAL, "==", "")
-					s.col++
-				} else {
-					s.addToken(EQUAL, "=", "")
-				}
-			} else if s.char == '>' {
-				s.addToken(GREATER, ">", "")
-			} else if s.char == '<' {
-				s.addToken(LESS, "<", "")
+	for !s.isAtEnd() {
+		if s.char == '(' {
+			s.addToken(LEFT_PAREN, "(", "")
+		} else if s.char == ')' {
+			s.addToken(RIGHT_PAREN, ")", "")
+		} else if s.char == '{' {
+			s.addToken(LEFT_BRACE, "{", "")
+		} else if s.char == '}' {
+			s.addToken(RIGHT_BRACE, "}", "")
+		} else if s.char == ',' {
+			s.addToken(COMMA, ",", "")
+		} else if s.char == '.' {
+			s.addToken(DOT, ".", "")
+		} else if s.char == '-' {
+			s.addToken(MINUS, "-", "")
+		} else if s.char == '+' {
+			s.addToken(PLUS, "+", "")
+		} else if s.char == ';' {
+			s.addToken(SEMICOLON, ";", "")
+		} else if s.char == '/' {
+			s.addToken(SLASH, "/", "")
+		} else if s.char == '*' {
+			s.addToken(STAR, "*", "")
+		} else if s.char == '!' {
+			s.addToken(BANG, "!", "")
+		} else if s.char == '=' {
+			if s.peak() == '=' {
+				s.addToken(EQUAL_EQUAL, "==", "")
+				s.current++
 			} else {
-				hasError = true
-				reportError(s.row+1, "Unexpected character: "+string(s.char))
+				s.addToken(EQUAL, "=", "")
 			}
+		} else if s.char == '>' {
+			s.addToken(GREATER, ">", "")
+		} else if s.char == '<' {
+			s.addToken(LESS, "<", "")
+		} else if s.char == '\n' {
+			s.lines++
+		} else {
+			hasError = true
+			reportError(s.lines+1, "Unexpected character: "+string(s.char))
 		}
+
+		s.advance()
 	}
 
 	s.addToken("EOF", "EOF", "")
 
 	return s.tokens, hasError
 
+}
+
+func (s Scanner) peak() byte {
+	// fmt.Println("in peak: ", s.source, s.lines, s.current, s.source[s.current])
+	if s.current+1 < len(s.source) {
+		return s.source[s.current+1]
+	}
+
+	return '\x00'
+}
+
+func (s *Scanner) advance() error {
+	s.current++
+
+	if s.current < len(s.source) {
+		s.char = s.source[s.current]
+
+		return nil
+	}
+
+	return errors.New("EOF")
+}
+
+func (s Scanner) isAtEnd() bool {
+	return s.current >= len(s.source)
 }
 
 func (s *Scanner) addToken(tokenType string, lexeme string, literal string) {

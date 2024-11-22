@@ -102,7 +102,6 @@ func main() {
 	}
 
 	scanner := NewScanner(string(fileContents))
-
 	tokens, hasError := scanner.Lex()
 
 	for _, token := range tokens {
