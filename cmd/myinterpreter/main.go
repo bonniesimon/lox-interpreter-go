@@ -6,7 +6,8 @@ import (
 	"strings"
 )
 
-func scanner(fileContents string) ([]Token, bool) {
+// Depreciated in favour of Scanner struct
+func scannerDepreciated(fileContents string) ([]Token, bool) {
 	var tokens []Token
 	hasError := false
 
@@ -95,19 +96,22 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
 	}
 
-	if len(fileContents) > 0 {
-		tokens, hasError := scanner(string(fileContents))
+	if len(fileContents) <= 0 {
+		fmt.Println("EOF  null")
+		return
+	}
 
-		for _, token := range tokens {
-			token.Debug()
-			fmt.Println()
-		}
+	scanner := NewScanner(string(fileContents))
 
-		if hasError {
-			os.Exit(65)
-		}
-	} else {
-		fmt.Println("EOF  null") // Placeholder, remove this line when implementing the scanner
+	tokens, hasError := scanner.Lex()
+
+	for _, token := range tokens {
+		token.Debug()
+		fmt.Println()
+	}
+
+	if hasError {
+		os.Exit(65)
 	}
 
 }
