@@ -70,26 +70,29 @@ func reportError(lineNumber int, errorMessage string) {
 	fmt.Fprintf(os.Stderr, "[line %d] Error: %s\n", lineNumber, errorMessage)
 }
 
-func main() {
+func getCommand() (string, string) {
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "Usage: ./your_program.sh tokenize <filename>")
 		os.Exit(1)
 	}
 
 	command := os.Args[1]
+	filename := os.Args[2]
+
+	return command, filename
+}
+
+func main() {
+	command, filename := getCommand()
 
 	if command != "tokenize" {
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)
 		os.Exit(1)
 	}
 
-	// Uncomment this block to pass the first stage
-
-	filename := os.Args[2]
 	fileContents, err := os.ReadFile(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
-		os.Exit(1)
 	}
 
 	if len(fileContents) > 0 {
