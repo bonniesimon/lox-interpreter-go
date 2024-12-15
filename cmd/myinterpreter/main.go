@@ -67,6 +67,7 @@ func scannerDepreciated(fileContents string) ([]Token, bool) {
 	return tokens, hasError
 }
 
+// Depreciated: moved to Scanner class
 func reportError(lineNumber int, errorMessage string) {
 	fmt.Fprintf(os.Stderr, "[line %d] Error: %s\n", lineNumber, errorMessage)
 }
@@ -102,14 +103,14 @@ func main() {
 	}
 
 	scanner := NewScanner(string(fileContents))
-	tokens, hasError := scanner.Lex()
+	scanner.Lex()
 
-	for _, token := range tokens {
+	for _, token := range scanner.tokens {
 		token.Debug()
 		fmt.Println()
 	}
 
-	if hasError {
+	if scanner.hasError {
 		os.Exit(65)
 	}
 

@@ -3,23 +3,23 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
 )
 
 type Scanner struct {
-	source  string
-	char    byte
-	current int
-	lines   int
-	tokens  []Token
+	source   string
+	char     byte
+	current  int
+	lines    int
+	tokens   []Token
+	hasError bool
 }
 
 func NewScanner(contents string) Scanner {
-	return Scanner{contents, contents[0], 0, 0, []Token{}}
+	return Scanner{contents, contents[0], 0, 0, []Token{}, false}
 }
 
-func (s Scanner) Lex() ([]Token, bool) {
-	hasError := false
-
+func (s *Scanner) Lex() {
 	for !s.isAtEnd() {
 		if s.char == '\t' || s.char == '\r' || s.char == ' ' {
 			// Skip
@@ -86,7 +86,10 @@ func (s Scanner) Lex() ([]Token, bool) {
 				isQuoteOpen := true
 
 				for s.char != '"' && s.char != '\n' {
+					// fmt.Println("in literal loop")
+					// fmt.Printf("[line %d]: %c\n", s.lines, s.char)
 					literal = append(literal, s.char)
+					s.advance()
 				}
 
 				if s.char == '"' {
@@ -96,23 +99,19 @@ func (s Scanner) Lex() ([]Token, bool) {
 				}
 
 				if isQuoteOpen {
-					reportError(s.lines+1, "Unterminated string.")
+					s.reportError(s.lines+1, "Unterminated string.")
 				}
 			}
 		} else if s.char == '\n' {
 			s.lines++
 		} else {
-			hasError = true
-			reportError(s.lines+1, "Unexpected character: "+string(s.char))
+			s.reportError(s.lines+1, "Unexpected character: "+string(s.char))
 		}
 
 		s.advance()
 	}
 
 	s.addToken("EOF", "EOF", "")
-
-	return s.tokens, hasError
-
 }
 
 func (s Scanner) peak() byte {
@@ -157,4 +156,9 @@ func (s *Scanner) addToken(tokenType string, lexeme string, literal string) {
 	newToken := Token{tokenType, lexeme, literal}
 
 	s.tokens = append(s.tokens, newToken)
+}
+
+func (s *Scanner) reportError(lineNumber int, errorMessage string) {
+	s.hasError = true
+	fmt.Fprintf(os.Stderr, "[line %d] Error: %s\n", lineNumber, errorMessage)
 }
