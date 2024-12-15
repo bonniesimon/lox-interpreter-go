@@ -20,7 +20,9 @@ func (s Scanner) Lex() ([]Token, bool) {
 	hasError := false
 
 	for !s.isAtEnd() {
-		if s.char == '(' {
+		if s.char == '\t' || s.char == '\r' || s.char == ' ' {
+			// Skip
+		} else if s.char == '(' {
 			s.addToken(LEFT_PAREN, "(", "")
 		} else if s.char == ')' {
 			s.addToken(RIGHT_PAREN, ")", "")
