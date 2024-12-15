@@ -39,7 +39,11 @@ func (s Scanner) Lex() ([]Token, bool) {
 		} else if s.char == ';' {
 			s.addToken(SEMICOLON, ";", "")
 		} else if s.char == '/' {
-			s.addToken(SLASH, "/", "")
+			if s.peak() == '/' {
+				s.skipLine()
+			} else {
+				s.addToken(SLASH, "/", "")
+			}
 		} else if s.char == '*' {
 			s.addToken(STAR, "*", "")
 		} else if s.char == '!' {
@@ -92,6 +96,16 @@ func (s Scanner) peak() byte {
 	}
 
 	return '\x00'
+}
+
+func (s *Scanner) skipLine() {
+	for s.char != '\n' {
+		err := s.advance()
+
+		if err != nil {
+			break
+		}
+	}
 }
 
 func (s *Scanner) advance() error {
