@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 )
 
 type Scanner struct {
@@ -77,6 +78,27 @@ func (s Scanner) Lex() ([]Token, bool) {
 			} else {
 				s.addToken(LESS, "<", "")
 			}
+		} else if s.char == '"' {
+			if s.peak() != '\n' {
+				s.advance()
+
+				var literal []byte
+				isQuoteOpen := true
+
+				for s.char != '"' && s.char != '\n' {
+					literal = append(literal, s.char)
+				}
+
+				if s.char == '"' {
+					isQuoteOpen = false
+					rawLiteral := fmt.Sprintf("\"%s\"", literal)
+					s.addToken(STRING, rawLiteral, string(literal))
+				}
+
+				if isQuoteOpen {
+					reportError(s.lines+1, "Unterminated string.")
+				}
+			}
 		} else if s.char == '\n' {
 			s.lines++
 		} else {
@@ -121,6 +143,10 @@ func (s *Scanner) advance() error {
 	}
 
 	return errors.New("EOF")
+}
+
+func (s *Scanner) isAtLineEnd() bool {
+	return s.peak() == '\n'
 }
 
 func (s Scanner) isAtEnd() bool {
