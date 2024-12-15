@@ -43,6 +43,7 @@ func (s Scanner) Lex() ([]Token, bool) {
 		} else if s.char == '/' {
 			if s.peak() == '/' {
 				s.skipLine()
+				s.lines++
 			} else {
 				s.addToken(SLASH, "/", "")
 			}
