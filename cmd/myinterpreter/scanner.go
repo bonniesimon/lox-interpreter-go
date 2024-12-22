@@ -100,6 +100,7 @@ func (s *Scanner) Lex() {
 
 				if isQuoteOpen {
 					s.reportError(s.lines+1, "Unterminated string.")
+					s.advance()
 				}
 			}
 		} else if s.char == '\n' {
